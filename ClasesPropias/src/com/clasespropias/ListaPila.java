@@ -33,7 +33,7 @@ import java.util.EmptyStackException;
  * @since JDK 1.0
  * @param <E> el tipo de elementos contenidos en esta colección
  */
-public class ListaPila<E> extends ListaVector<E> implements Pila<E>{
+public class ListaPila<E> extends ListaVector<E> implements Pila<E> {
 
     //Atributos de la clase ListaPila.
     /**
@@ -137,4 +137,26 @@ public class ListaPila<E> extends ListaVector<E> implements Pila<E>{
         }
         return -1;
     }
+
+    /**
+     * <p>
+     * Muestra todos los elementos agregados en la pila.
+     *
+     * @return los elementos agregados en la pila.
+     */
+    @Override
+    public String imprimir() {
+        String s = "";
+        ListaPila<E> listaPilaAuxiliar = new ListaPila<>();
+        while (!this.estaVacia()) {
+            E elemento = this.quitar();
+            s += elemento + "\n";
+            listaPilaAuxiliar.poner(elemento);
+        }
+        while (!listaPilaAuxiliar.estaVacia()) {
+            this.poner(listaPilaAuxiliar.quitar());
+        }
+        return s;
+    }
+
 }

@@ -67,4 +67,12 @@ public interface Pila<E> extends Coleccion<E> {
      */
     public int buscar(Object objeto);
 
+    /**
+     * <p>
+     * Muestra todos los elementos agregados en la pila.
+     *
+     * @return los elementos agregados en la pila.
+     */
+    public String imprimir();
+
 }
