@@ -69,7 +69,7 @@ public interface Pila<E> extends Coleccion<E> {
 
     /**
      * <p>
-     * Muestra todos los elementos agregados en la pila.
+     * Imprime todos los elementos agregados en la pila.
      *
      * @return los elementos agregados en la pila.
      */

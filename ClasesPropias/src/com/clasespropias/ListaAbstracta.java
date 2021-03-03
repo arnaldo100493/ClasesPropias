@@ -260,7 +260,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
 
     /**
      * <p>
-     * Muestra todos los elementos agregados en la lista.
+     * Imprime todos los elementos agregados en la lista.
      *
      * @return los elementos agregados en la lista.
      */
@@ -268,7 +268,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
 
     /**
      * <p>
-     * Imprime todos los elementos agregados en la lista.
+     * Muestra todos los elementos agregados en la lista.
      *
      * @return los elementos agregados en la lista.
      */
@@ -457,7 +457,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
      * {@code RandomAccess}.      
      * <p>
      * El {@code establecer(int, E)} de la subclase, todos los métodos null null
-     * null null null null null null null null null null null null null null     {@code obtener(int)},
+     * null null null null null null null null null null null null null null null     {@code obtener(int)},
      * {@code agregar (int, E)}, {@code remover(int)}, {@code agregarTodo(int,
      * Coleccion)} y {@code removerRangg (int, int)} delegar en los métodos
      * correspondientes en la lista de resúmenes de respaldo, después de
