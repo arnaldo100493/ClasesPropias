@@ -624,16 +624,6 @@ public class ColaArreglo<E> extends ColeccionAbstracta<E> implements Cola<E>, Cl
         }
     }
 
-    @Override
-    public boolean conservarTodo(Coleccion<?> coleccion) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean contieneTodo(Coleccion<?> coleccion) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     /**
      * Devuelve {@code true} si esta cola contiene el elemento especificado. Más
      * formalmente, devuelve {@code true} si y solo si esta cola contiene al
@@ -850,11 +840,6 @@ public class ColaArreglo<E> extends ColeccionAbstracta<E> implements Cola<E>, Cl
     @Override
     public Spliterator<E> spliterator() {
         return new ColaDequeSpliterator<E>(this, -1, -1);
-    }
-
-    @Override
-    public boolean removerTodo(Coleccion<?> coleccion) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     // ****** Utilidades de asignación y cambio de tamaño de arreglos ******
