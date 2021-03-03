@@ -226,6 +226,12 @@ public abstract class ListaSecuencialAbstracta<E> extends ListaAbstracta<E> {
     public abstract ListIterator<E> listIterator(int indice);
 
     /**
+     * {@inheritDoc}      
+     */
+    @Override
+    public abstract String mostrar();
+
+    /**
      * Devuelve el elemento en la posición especificada en esta lista.    
      * <p>
      * Esta implementación primero obtiene un iterador de lista que apunta al

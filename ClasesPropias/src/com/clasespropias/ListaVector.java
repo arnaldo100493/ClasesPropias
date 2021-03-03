@@ -104,7 +104,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      *
      * @serial      
      */
-    protected int conteoElemento;
+    protected int contadorElemento;
 
     /**
      * La cantidad por la cual la capacidad del vector es automáticamente
@@ -154,10 +154,10 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     public ListaVector(Coleccion<? extends E> coleccion) {
         this.listadoDatosElemento = coleccion.paraFormar();
-        this.conteoElemento = this.listadoDatosElemento.length;
+        this.contadorElemento = this.listadoDatosElemento.length;
         //Coleccion.paraFormar podría (incorrectamente) no devolver Object[] (ver 6260652)
         if (this.listadoDatosElemento.getClass() != Object[].class) {
-            this.listadoDatosElemento = Arrays.copyOf(this.listadoDatosElemento, this.conteoElemento, Object[].class);
+            this.listadoDatosElemento = Arrays.copyOf(this.listadoDatosElemento, this.contadorElemento, Object[].class);
         }
     }
 
@@ -204,9 +204,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized boolean agregar(E elemento) {
-        this.conteoModulo++;
-        this.ayudanteAsegurarCapacidad(this.conteoElemento + 1);
-        this.listadoDatosElemento[this.conteoElemento++] = elemento;
+        this.moduloContador++;
+        this.asegurarCapacidadAyudante(this.contadorElemento + 1);
+        this.listadoDatosElemento[this.contadorElemento++] = elemento;
         return true;
     }
 
@@ -239,9 +239,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * @param elemento el componente que se agregará      
      */
     public synchronized void agregarElemento(E elemento) {
-        this.conteoModulo++;
-        this.ayudanteAsegurarCapacidad(this.conteoElemento + 1);
-        this.listadoDatosElemento[this.conteoElemento++] = elemento;
+        this.moduloContador++;
+        this.asegurarCapacidadAyudante(this.contadorElemento + 1);
+        this.listadoDatosElemento[this.contadorElemento++] = elemento;
     }
 
     /**
@@ -264,16 +264,16 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized boolean agregarTodo(int indice, Coleccion<? extends E> coleccion) {
-        this.conteoModulo++;
-        if (indice < 0 || indice > this.conteoElemento) {
+        this.moduloContador++;
+        if (indice < 0 || indice > this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice);
         }
 
         Object[] arreglo = coleccion.paraFormar();
         int numeroNuevo = arreglo.length;
-        this.ayudanteAsegurarCapacidad(this.conteoElemento + numeroNuevo);
+        this.asegurarCapacidadAyudante(this.contadorElemento + numeroNuevo);
 
-        int numeroMovido = this.conteoElemento - indice;
+        int numeroMovido = this.contadorElemento - indice;
         if (numeroMovido > 0) {
             System.arraycopy(this.listadoDatosElemento,
                     indice,
@@ -287,7 +287,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 this.listadoDatosElemento,
                 indice,
                 numeroNuevo);
-        this.conteoElemento += numeroNuevo;
+        this.contadorElemento += numeroNuevo;
         return numeroNuevo != 0;
     }
 
@@ -307,16 +307,16 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized boolean agregarTodo(Coleccion<? extends E> coleccion) {
-        this.conteoModulo++;
+        this.moduloContador++;
         Object[] arreglo = coleccion.paraFormar();
         int numeroNuevo = arreglo.length;
-        this.ayudanteAsegurarCapacidad(this.conteoElemento + numeroNuevo);
+        this.asegurarCapacidadAyudante(this.contadorElemento + numeroNuevo);
         System.arraycopy(arreglo,
                 0,
                 this.listadoDatosElemento,
-                this.conteoElemento,
+                this.contadorElemento,
                 numeroNuevo);
-        this.conteoElemento += numeroNuevo;
+        this.contadorElemento += numeroNuevo;
         return numeroNuevo != 0;
     }
 
@@ -340,8 +340,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     public synchronized void asegurarCapacidad(int capacidadMinima) {
         if (capacidadMinima > 0) {
-            this.conteoModulo++;
-            this.ayudanteAsegurarCapacidad(capacidadMinima);
+            this.moduloContador++;
+            this.asegurarCapacidadAyudante(capacidadMinima);
         }
     }
 
@@ -353,7 +353,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      *
      * @see #asegurarCapacidad(int)      
      */
-    private void ayudanteAsegurarCapacidad(int capacidadMinima) {
+    private void asegurarCapacidadAyudante(int capacidadMinima) {
         //Código consciente de desbordamiento.
         if (capacidadMinima - this.listadoDatosElemento.length > 0) {
             this.crecer(capacidadMinima);
@@ -384,8 +384,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
             ListaVector<E> listaVector = (ListaVector<E>) super.clone();
             listaVector.listadoDatosElemento
                     = Arrays.copyOf(this.listadoDatosElemento,
-                            this.conteoElemento);
-            listaVector.conteoModulo = 0;
+                            this.contadorElemento);
+            listaVector.moduloContador = 0;
             return listaVector;
         } catch (CloneNotSupportedException ex) {
             //Esto no debería suceder, ya que somos clonables.
@@ -462,7 +462,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * @see #paraFormar(Object[])      
      */
     public synchronized void copiarEn(Object[] unArreglo) {
-        System.arraycopy(this.listadoDatosElemento, 0, unArreglo, 0, this.conteoElemento);
+        System.arraycopy(this.listadoDatosElemento, 0, unArreglo, 0, this.contadorElemento);
     }
 
     private void crecer(int capacidadMinima) {
@@ -489,7 +489,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
         final Object[] listadoDatos;
         synchronized (this) {
             fields.put("incrementoCapacidad", this.incrementoCapacidad);
-            fields.put("conteoElemento", this.conteoElemento);
+            fields.put("conteoElemento", this.contadorElemento);
             listadoDatos = this.listadoDatosElemento.clone();
         }
         fields.put("listadoDatos", listadoDatos);
@@ -508,8 +508,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * ({@code indice < 0 || indice > = tamanio()})      
      */
     public synchronized E elementoEn(int indice) {
-        if (indice >= this.conteoElemento) {
-            throw new ArrayIndexOutOfBoundsException(indice + " >= " + this.conteoElemento);
+        if (indice >= this.contadorElemento) {
+            throw new ArrayIndexOutOfBoundsException(indice + " >= " + this.contadorElemento);
         }
 
         return this.listadoDatosElemento(indice);
@@ -533,13 +533,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
             //Métodos de la clase anónima Enumeration.
             @Override
             public boolean hasMoreElements() {
-                return this.count < conteoElemento;
+                return this.count < contadorElemento;
             }
 
             @Override
             public E nextElement() {
                 synchronized (ListaVector.this) {
-                    if (this.count < conteoElemento) {
+                    if (this.count < contadorElemento) {
                         return listadoDatosElemento(this.count++);
                     }
                 }
@@ -569,7 +569,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * Indica si el argumento es el índice de un elemento existente.      
      */
     private boolean esIndiceElemento(int indice) {
-        return indice >= 0 && indice < this.conteoElemento;
+        return indice >= 0 && indice < this.contadorElemento;
     }
 
     /**
@@ -577,7 +577,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * iterador o una operación de agregar.      
      */
     private boolean esIndicePosicion(int indice) {
-        return indice >= 0 && indice <= this.conteoElemento;
+        return indice >= 0 && indice <= this.contadorElemento;
     }
 
     /**
@@ -588,7 +588,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized boolean estaVacia() {
-        return this.conteoElemento == 0;
+        return this.contadorElemento == 0;
     }
 
     /**
@@ -604,7 +604,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized E establecer(int indice, E elemento) {
-        if (indice >= this.conteoElemento) {
+        if (indice >= this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice);
         }
 
@@ -635,9 +635,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * ({@code indice < 0 || indice> = tamanio()})      
      */
     public synchronized void establecerElementoEn(E objeto, int indice) {
-        if (indice >= this.conteoElemento) {
+        if (indice >= this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice + " >= "
-                    + conteoElemento);
+                    + contadorElemento);
         }
         this.listadoDatosElemento[indice] = objeto;
     }
@@ -653,28 +653,28 @@ public class ListaVector<E> extends ListaAbstracta<E>
      *      
      */
     public synchronized void establecerTamanio(int nuevoTamanio) {
-        this.conteoModulo++;
-        if (nuevoTamanio > this.conteoElemento) {
-            this.ayudanteAsegurarCapacidad(nuevoTamanio);
+        this.moduloContador++;
+        if (nuevoTamanio > this.contadorElemento) {
+            this.asegurarCapacidadAyudante(nuevoTamanio);
         } else {
-            for (int i = nuevoTamanio; i < this.conteoElemento; i++) {
+            for (int i = nuevoTamanio; i < this.contadorElemento; i++) {
                 this.listadoDatosElemento[i] = null;
             }
         }
-        this.conteoElemento = nuevoTamanio;
+        this.contadorElemento = nuevoTamanio;
     }
 
     @Override
     public synchronized void forEach(Consumer<? super E> action) {
         Objects.requireNonNull(action);
-        final int expectedModCount = this.conteoModulo;
+        final int expectedModCount = this.moduloContador;
         @SuppressWarnings("unchecked")
         final E[] elementData = (E[]) this.listadoDatosElemento;
-        final int elementCount = this.conteoElemento;
-        for (int i = 0; this.conteoModulo == expectedModCount && i < elementCount; i++) {
+        final int elementCount = this.contadorElemento;
+        for (int i = 0; this.moduloContador == expectedModCount && i < elementCount; i++) {
             action.accept(elementData[i]);
         }
-        if (this.conteoModulo != expectedModCount) {
+        if (this.moduloContador != expectedModCount) {
             throw new ConcurrentModificationException();
         }
     }
@@ -702,7 +702,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
     @Override
     public synchronized String imprimir() {
         String s = "";
-        for (int i = 0; i < this.conteoElemento; i++) {
+        for (int i = 0; i < this.contadorElemento; i++) {
             s += this.obtener(i) + "\n";
         }
         return s;
@@ -743,13 +743,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     public synchronized int indiceDe(Object objeto, int indice) {
         if (objeto == null) {
-            for (int i = indice; i < this.conteoElemento; i++) {
+            for (int i = indice; i < this.contadorElemento; i++) {
                 if (this.listadoDatosElemento[i] == null) {
                     return i;
                 }
             }
         } else {
-            for (int i = indice; i < this.conteoElemento; i++) {
+            for (int i = indice; i < this.contadorElemento; i++) {
                 if (objeto.equals(this.listadoDatosElemento[i])) {
                     return i;
                 }
@@ -780,19 +780,19 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * rango({@code indice < 0 || indice > tamanio()})
      */
     public synchronized void insertarElementoEn(Object objeto, int indice) {
-        this.conteoModulo++;
-        if (indice > this.conteoElemento) {
+        this.moduloContador++;
+        if (indice > this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice
-                    + " > " + this.conteoElemento);
+                    + " > " + this.contadorElemento);
         }
-        this.ayudanteAsegurarCapacidad(this.conteoElemento + 1);
+        this.asegurarCapacidadAyudante(this.contadorElemento + 1);
         System.arraycopy(this.listadoDatosElemento,
                 indice,
                 this.listadoDatosElemento,
                 indice + 1,
-                this.conteoElemento - indice);
+                this.contadorElemento - indice);
         this.listadoDatosElemento[indice] = objeto;
-        this.conteoElemento++;
+        this.contadorElemento++;
     }
 
     /**
@@ -850,7 +850,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized ListIterator<E> listIterator(int indice) {
-        if (indice < 0 || indice > this.conteoElemento) {
+        if (indice < 0 || indice > this.contadorElemento) {
             throw new IndexOutOfBoundsException("Index: " + indice);
         }
         return new ListItr(indice);
@@ -862,13 +862,25 @@ public class ListaVector<E> extends ListaAbstracta<E>
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public synchronized String mostrar() {
+        String s = "";
+        for (int i = 0; i < this.contadorElemento; i++) {
+            s += this.obtener(i) + "\n";
+        }
+        return s;
+    }
+
+    /**
      * Construye un mensaje de detalle de IndexOutOfBoundsException. De las
      * muchas refactorizaciones posibles del código de manejo de errores, este
      * "perfilado" funciona mejor con máquinas virtuales tanto de servidor como
      * de cliente.      
      */
-    private String mostrarMensajeFueraDeLosLimites(int indice) {
-        return "Índice: " + indice + ", Tamaño: " + this.conteoElemento;
+    private String mostrarMensajeFueraDeRango(int indice) {
+        return "Índice: " + indice + ", Tamaño: " + this.contadorElemento;
     }
 
     /**
@@ -883,7 +895,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized E obtener(int indice) {
-        if (indice >= this.conteoElemento) {
+        if (indice >= this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice);
         }
 
@@ -893,12 +905,12 @@ public class ListaVector<E> extends ListaAbstracta<E>
     @SuppressWarnings("unchecked")
     @Override
     public synchronized void ordenar(Comparator<? super E> comparador) {
-        final int conteoModuloEsperado = this.conteoModulo;
-        Arrays.sort((E[]) this.listadoDatosElemento, 0, this.conteoElemento, comparador);
-        if (this.conteoModulo != conteoModuloEsperado) {
+        final int conteoModuloEsperado = this.moduloContador;
+        Arrays.sort((E[]) this.listadoDatosElemento, 0, this.contadorElemento, comparador);
+        if (this.moduloContador != conteoModuloEsperado) {
             throw new ConcurrentModificationException();
         }
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -909,7 +921,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized Object[] paraFormar() {
-        return Arrays.copyOf(this.listadoDatosElemento, this.conteoElemento);
+        return Arrays.copyOf(this.listadoDatosElemento, this.contadorElemento);
     }
 
     /**
@@ -940,9 +952,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
     @SuppressWarnings("unchecked")
     @Override
     public synchronized <T> T[] paraFormar(T[] arreglo) {
-        if (arreglo.length < this.conteoElemento) {
+        if (arreglo.length < this.contadorElemento) {
             return (T[]) Arrays.copyOf(this.listadoDatosElemento,
-                    this.conteoElemento,
+                    this.contadorElemento,
                     arreglo.getClass());
         }
 
@@ -950,10 +962,10 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 0,
                 arreglo,
                 0,
-                this.conteoElemento);
+                this.contadorElemento);
 
-        if (arreglo.length > this.conteoElemento) {
-            arreglo[this.conteoElemento] = null;
+        if (arreglo.length > this.contadorElemento) {
+            arreglo[this.contadorElemento] = null;
         }
 
         return arreglo;
@@ -967,7 +979,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * @throws NoSuchElementException si este vector no tiene componentes      
      */
     public synchronized E primerElemento() {
-        if (this.conteoElemento == 0) {
+        if (this.contadorElemento == 0) {
             throw new NoSuchElementException();
         }
         return this.listadoDatosElemento(0);
@@ -981,11 +993,11 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * más pequeño. Una aplicación puede usar esta operación para minimizar el
      * almacenamiento de un vector.      
      */
-    public synchronized void recortarATamanio() {
-        this.conteoModulo++;
+    public synchronized void recortarAlTamanio() {
+        this.moduloContador++;
         int capacidadAntigua = this.listadoDatosElemento.length;
-        if (this.conteoElemento < capacidadAntigua) {
-            this.listadoDatosElemento = Arrays.copyOf(this.listadoDatosElemento, this.conteoElemento);
+        if (this.contadorElemento < capacidadAntigua) {
+            this.listadoDatosElemento = Arrays.copyOf(this.listadoDatosElemento, this.contadorElemento);
         }
     }
 
@@ -993,15 +1005,15 @@ public class ListaVector<E> extends ListaAbstracta<E>
     @SuppressWarnings("unchecked")
     public synchronized void reemplazarTodo(UnaryOperator<E> operador) {
         Objects.requireNonNull(operador);
-        final int conteoModuloEsperado = this.conteoModulo;
-        final int tamanio = this.conteoElemento;
-        for (int i = 0; this.conteoModulo == conteoModuloEsperado && i < tamanio; i++) {
+        final int conteoModuloEsperado = this.moduloContador;
+        final int tamanio = this.contadorElemento;
+        for (int i = 0; this.moduloContador == conteoModuloEsperado && i < tamanio; i++) {
             this.listadoDatosElemento[i] = operador.apply((E) this.listadoDatosElemento[i]);
         }
-        if (this.conteoModulo != conteoModuloEsperado) {
+        if (this.moduloContador != conteoModuloEsperado) {
             throw new ConcurrentModificationException();
         }
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -1019,13 +1031,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized E remover(int indice) {
-        this.conteoModulo++;
-        if (indice >= this.conteoElemento) {
+        this.moduloContador++;
+        if (indice >= this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice);
         }
         E valorAntiguo = this.listadoDatosElemento(indice);
 
-        int numeroMovido = this.conteoElemento - indice - 1;
+        int numeroMovido = this.contadorElemento - indice - 1;
         if (numeroMovido > 0) {
             System.arraycopy(this.listadoDatosElemento,
                     indice + 1,
@@ -1033,7 +1045,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                     indice,
                     numeroMovido);
         }
-        this.listadoDatosElemento[--this.conteoElemento] = null; //Deja que gc haga su trabajo.
+        this.listadoDatosElemento[--this.contadorElemento] = null; //Deja que gc haga su trabajo.
 
         return valorAntiguo;
     }
@@ -1070,7 +1082,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * {@code false} de lo contrario.      
      */
     public synchronized boolean removerElemento(Object objeto) {
-        this.conteoModulo++;
+        this.moduloContador++;
         int i = this.indiceDe(objeto);
         if (i >= 0) {
             this.removerElementoEn(i);
@@ -1099,20 +1111,20 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * ({@code indice < 0 || indice > = tamanio()})      
      */
     public synchronized void removerElementoEn(int indice) {
-        this.conteoModulo++;
-        if (indice >= this.conteoElemento) {
+        this.moduloContador++;
+        if (indice >= this.contadorElemento) {
             throw new ArrayIndexOutOfBoundsException(indice + " >= "
-                    + this.conteoElemento);
+                    + this.contadorElemento);
         } else if (indice < 0) {
             throw new ArrayIndexOutOfBoundsException(indice);
         }
-        int j = this.conteoElemento - indice - 1;
+        int j = this.contadorElemento - indice - 1;
         if (j > 0) {
             System.arraycopy(this.listadoDatosElemento, indice + 1,
                     this.listadoDatosElemento, indice, j);
         }
-        this.conteoElemento--;
-        this.listadoDatosElemento[this.conteoElemento] = null;
+        this.contadorElemento--;
+        this.listadoDatosElemento[this.contadorElemento] = null;
         /* Deja que gc haga su trabajo*/
     }
 
@@ -1121,7 +1133,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
         int r = 0, w = 0;
         boolean modificado = false;
         try {
-            for (; r < this.conteoElemento; r++) {
+            for (; r < this.contadorElemento; r++) {
                 if (coleccion.contiene(this.listadoDatosElemento[r])
                         == complemento) {
                     this.listadoDatosElemento[w++]
@@ -1132,18 +1144,18 @@ public class ListaVector<E> extends ListaAbstracta<E>
             /*Preservar la compatibilidad de comportamiento con 
             ColeccionAbstracta*,*/
             //incluso si coleccion.contiene() lanza.
-            if (r != this.conteoElemento) {
+            if (r != this.contadorElemento) {
                 System.arraycopy(listadoDatosElemento, r, listadoDatosElemento,
-                        w, this.conteoElemento - r);
-                w += this.conteoElemento - r;
+                        w, this.contadorElemento - r);
+                w += this.contadorElemento - r;
             }
-            if (w != this.conteoElemento) {
+            if (w != this.contadorElemento) {
                 //Limpia para dejar que GC haga su trabajo.
-                for (int i = w; i < this.conteoElemento; i++) {
+                for (int i = w; i < this.contadorElemento; i++) {
                     listadoDatosElemento[i] = null;
                 }
-                this.conteoModulo += this.conteoElemento - w;
-                this.conteoElemento = w;
+                this.moduloContador += this.contadorElemento - w;
+                this.contadorElemento = w;
                 modificado = true;
             }
         }
@@ -1155,13 +1167,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
       * devuelve el valor eliminado.
       */
     private synchronized void removerRapido(int indice) {
-        this.conteoModulo++;
-        int numeroMovido = this.conteoElemento - indice - 1;
+        this.moduloContador++;
+        int numeroMovido = this.contadorElemento - indice - 1;
         if (numeroMovido > 0) {
             System.arraycopy(this.listadoDatosElemento, indice + 1,
                     this.listadoDatosElemento, indice, numeroMovido);
         }
-        this.listadoDatosElemento[--this.conteoElemento] = null;
+        this.listadoDatosElemento[--this.contadorElemento] = null;
         /*Limpia para dejar 
         que GC haga su trabajo.*/
     }
@@ -1177,8 +1189,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     protected synchronized void removerRango(int desdeIndice, int hastaIndice) {
-        this.conteoModulo++;
-        int nuumeroMovido = this.conteoElemento - hastaIndice;
+        this.moduloContador++;
+        int nuumeroMovido = this.contadorElemento - hastaIndice;
         System.arraycopy(this.listadoDatosElemento,
                 hastaIndice,
                 this.listadoDatosElemento,
@@ -1186,9 +1198,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 nuumeroMovido);
 
         //Deja que gc haga su trabajo.
-        int nuevoConteoElemento = this.conteoElemento - (hastaIndice - desdeIndice);
-        while (this.conteoElemento != nuevoConteoElemento) {
-            this.listadoDatosElemento[--this.conteoElemento] = null;
+        int nuevoConteoElemento = this.contadorElemento - (hastaIndice - desdeIndice);
+        while (this.contadorElemento != nuevoConteoElemento) {
+            this.listadoDatosElemento[--this.contadorElemento] = null;
         }
     }
 
@@ -1200,10 +1212,10 @@ public class ListaVector<E> extends ListaAbstracta<E>
         //Cualquier excepción arrojada desde el predicado filtro en esta etapa.
         //Dejará la colección sin modificaciones.
         int removerConteo = 0;
-        final int tamanio = this.conteoElemento;
+        final int tamanio = this.contadorElemento;
         final BitSet removerConjunto = new BitSet(tamanio);
-        final int conteoModuloEsperado = this.conteoModulo;
-        for (int i = 0; this.conteoModulo == conteoModuloEsperado && i < tamanio; i++) {
+        final int conteoModuloEsperado = this.moduloContador;
+        for (int i = 0; this.moduloContador == conteoModuloEsperado && i < tamanio; i++) {
             @SuppressWarnings("unchecked")
             final E element = (E) this.listadoDatosElemento[i];
             if (filtro.test(element)) {
@@ -1211,7 +1223,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 removerConteo++;
             }
         }
-        if (this.conteoModulo != conteoModuloEsperado) {
+        if (this.moduloContador != conteoModuloEsperado) {
             throw new ConcurrentModificationException();
         }
 
@@ -1227,11 +1239,11 @@ public class ListaVector<E> extends ListaAbstracta<E>
             for (int k = nuevoTamanio; k < tamanio; k++) {
                 this.listadoDatosElemento[k] = null; //Deja que gc haga su trabajo.
             }
-            this.conteoElemento = nuevoTamanio;
-            if (this.conteoModulo != conteoModuloEsperado) {
+            this.contadorElemento = nuevoTamanio;
+            if (this.moduloContador != conteoModuloEsperado) {
                 throw new ConcurrentModificationException();
             }
-            this.conteoModulo++;
+            this.moduloContador++;
         }
 
         return cualquieraParaRemover;
@@ -1267,13 +1279,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * es parte de la interfaz {@link Lista}).      
      */
     public synchronized void removerTodosLosElementos() {
-        this.conteoModulo++;
+        this.moduloContador++;
         //Deja que gc haga su trabajo.
-        for (int i = 0; i < this.conteoElemento; i++) {
+        for (int i = 0; i < this.contadorElemento; i++) {
             this.listadoDatosElemento[i] = null;
         }
 
-        this.conteoElemento = 0;
+        this.contadorElemento = 0;
     }
 
     /**
@@ -1353,7 +1365,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized int tamanio() {
-        return this.conteoElemento;
+        return this.contadorElemento;
     }
 
     /**
@@ -1373,10 +1385,10 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * @throws NoSuchElementException si este vector está vacío      
      */
     public synchronized E ultimoElemento() {
-        if (this.conteoElemento == 0) {
+        if (this.contadorElemento == 0) {
             throw new NoSuchElementException();
         }
-        return this.listadoDatosElemento(this.conteoElemento - 1);
+        return this.listadoDatosElemento(this.contadorElemento - 1);
     }
 
     /**
@@ -1392,7 +1404,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
      */
     @Override
     public synchronized int ultimoIndiceDe(Object objeto) {
-        return this.ultimoIndiceDe(objeto, this.conteoElemento - 1);
+        return this.ultimoIndiceDe(objeto, this.contadorElemento - 1);
     }
 
     /**
@@ -1413,8 +1425,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * igual o igual al tamaño actual de este vector      
      */
     public synchronized int ultimoIndiceDe(Object objeto, int indice) {
-        if (indice >= this.conteoElemento) {
-            throw new IndexOutOfBoundsException(indice + " >= " + this.conteoElemento);
+        if (indice >= this.contadorElemento) {
+            throw new IndexOutOfBoundsException(indice + " >= " + this.contadorElemento);
         }
 
         if (objeto == null) {
@@ -1435,13 +1447,13 @@ public class ListaVector<E> extends ListaAbstracta<E>
 
     private void verificarIndiceElemento(int indice) {
         if (!this.esIndiceElemento(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
     private void verificarIndicePosicion(int indice) {
         if (!this.esIndicePosicion(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1453,9 +1465,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * negativo.      
      */
     private void verificarRango(int indice) {
-        if (indice >= this.conteoElemento) {
+        if (indice >= this.contadorElemento) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1463,9 +1475,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
      * Una versión de verificarRango utilizada por agregar y agregarTodo.      
      */
     private void verificarRangoParaAgregar(int indice) {
-        if (indice > this.conteoElemento || indice < 0) {
+        if (indice > this.contadorElemento || indice < 0) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1491,19 +1503,19 @@ public class ListaVector<E> extends ListaAbstracta<E>
 
         //Atributos de la clase interna Itr.
         int cursor;       //Índice del próximo elemento a devolver.
-        int expectedModCount = conteoModulo;
+        int expectedModCount = moduloContador;
         int lastRet = -1; //Índice del último elemento devuelto; -1 si no hay tal.
 
         //Constructor de la clase interna Itr.
         Itr() {
             this.cursor = 0;
-            this.expectedModCount = conteoModulo;
+            this.expectedModCount = moduloContador;
             this.lastRet = -1;
         }
 
         //Métodos de la clase interna Itr.
         final void checkForComodification() {
-            if (conteoModulo != this.expectedModCount) {
+            if (moduloContador != this.expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -1512,7 +1524,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
             synchronized (ListaVector.this) {
-                final int size = conteoElemento;
+                final int size = contadorElemento;
                 int i = this.cursor;
                 if (i >= size) {
                     return;
@@ -1523,7 +1535,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 if (i >= listadoDatosElemento.length) {
                     throw new ConcurrentModificationException();
                 }
-                while (i != size && conteoModulo == this.expectedModCount) {
+                while (i != size && moduloContador == this.expectedModCount) {
                     action.accept(listadoDatosElemento[i++]);
                 }
                 /*Actualiza una vez al final de la iteración para reducir el 
@@ -1539,7 +1551,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             /*Racy pero dentro de las especificaciones, 
             ya que las modificaciones se verifican.*/
  /*Dentro o después de la sincronización en siguiente / anterior.*/
-            return this.cursor != conteoElemento;
+            return this.cursor != contadorElemento;
         }
 
         @Override
@@ -1547,7 +1559,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             synchronized (ListaVector.this) {
                 this.checkForComodification();
                 int i = this.cursor;
-                if (i >= conteoElemento) {
+                if (i >= contadorElemento) {
                     throw new NoSuchElementException();
                 }
                 this.cursor = i + 1;
@@ -1563,7 +1575,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             synchronized (ListaVector.this) {
                 this.checkForComodification();
                 ListaVector.this.remover(this.lastRet);
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             }
             this.cursor = this.lastRet;
             this.lastRet = -1;
@@ -1594,7 +1606,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             synchronized (ListaVector.this) {
                 this.checkForComodification();
                 ListaVector.this.agregar(i, e);
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             }
             this.cursor = i + 1;
             this.lastRet = -1;
@@ -1700,9 +1712,9 @@ public class ListaVector<E> extends ListaAbstracta<E>
             if ((lst = this.list) != null) {
                 if ((hi = this.fence) < 0) {
                     synchronized (lst) {
-                        this.expectedModCount = lst.conteoModulo;
+                        this.expectedModCount = lst.moduloContador;
                         a = this.array = lst.listadoDatosElemento;
-                        hi = this.fence = lst.conteoElemento;
+                        hi = this.fence = lst.contadorElemento;
                     }
                 } else {
                     a = this.array;
@@ -1711,7 +1723,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                     while (i < hi) {
                         action.accept((E) a[i++]);
                     }
-                    if (lst.conteoModulo == this.expectedModCount) {
+                    if (lst.moduloContador == this.expectedModCount) {
                         return;
                     }
                 }
@@ -1724,8 +1736,8 @@ public class ListaVector<E> extends ListaAbstracta<E>
             if ((hi = this.fence) < 0) {
                 synchronized (this.list) {
                     this.array = this.list.listadoDatosElemento;
-                    this.expectedModCount = this.list.conteoModulo;
-                    hi = this.fence = this.list.conteoElemento;
+                    this.expectedModCount = this.list.moduloContador;
+                    hi = this.fence = this.list.contadorElemento;
                 }
             }
             return hi;
@@ -1741,7 +1753,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             if (getFence() > (i = this.index)) {
                 this.index = i + 1;
                 action.accept((E) this.array[i]);
-                if (this.list.conteoModulo != this.expectedModCount) {
+                if (this.list.moduloContador != this.expectedModCount) {
                     throw new ConcurrentModificationException();
                 }
                 return true;
@@ -1776,7 +1788,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.compensacionDePadres = 0;
             this.compensacion = 0;
             this.tamanio = 0;
-            this.conteoModulo = 0;
+            this.moduloContador = 0;
         }
 
         SubLista(ListaAbstracta<E> padre, int compensacion, int desdeIndice,
@@ -1785,7 +1797,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.compensacionDePadres = desdeIndice;
             this.compensacion = compensacion + desdeIndice;
             this.tamanio = hastaIndice - desdeIndice;
-            this.conteoModulo = ListaVector.this.conteoModulo;
+            this.moduloContador = ListaVector.this.moduloContador;
         }
 
         //Métodos de la clase interna SubLista.
@@ -1794,7 +1806,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.verificarRangoParaAgregar(indice);
             this.verificarParaMercantilizacion();
             this.padre.agregar(this.compensacionDePadres + indice, elemento);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio++;
         }
 
@@ -1814,7 +1826,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             this.padre.agregarTodo(this.compensacionDePadres
                     + indice, coleccion);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio += tamanioColeccion;
             return true;
         }
@@ -1832,7 +1844,12 @@ public class ListaVector<E> extends ListaAbstracta<E>
 
         @Override
         public String imprimir() {
-            return new ListaArreglo<>().imprimir();
+            return new ListaVector<>().imprimir();
+        }
+
+        @Override
+        public String mostrar() {
+            return new ListaVector<>().mostrar();
         }
 
         @Override
@@ -1853,7 +1870,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                 interna SubLista.*/
                 int cursor = indice;
                 int lastRet = -1;
-                int expectedModCount = ListaVector.this.conteoModulo;
+                int expectedModCount = ListaVector.this.moduloContador;
 
                 /*Métodos de la clase anónima interna ListIterator de la clase
                 interna SubLista.*/
@@ -1866,14 +1883,14 @@ public class ListaVector<E> extends ListaAbstracta<E>
                         ListaVector.SubLista.this.agregar(i, e);
                         this.cursor = i + 1;
                         this.lastRet = -1;
-                        this.expectedModCount = ListaVector.this.conteoModulo;
+                        this.expectedModCount = ListaVector.this.moduloContador;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
                 }
 
                 final void checkForComodification() {
-                    if (this.expectedModCount != ListaVector.this.conteoModulo) {
+                    if (this.expectedModCount != ListaVector.this.moduloContador) {
                         throw new ConcurrentModificationException();
                     }
                 }
@@ -1892,7 +1909,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                     if (offset + i >= elementData.length) {
                         throw new ConcurrentModificationException();
                     }
-                    while (i != size && conteoModulo == this.expectedModCount) {
+                    while (i != size && moduloContador == this.expectedModCount) {
                         consumer.accept((E) elementData[offset + (i++)]);
                     }
                     /*Actualizar una vez al final de la iteración para reducir 
@@ -1966,7 +1983,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
                         ListaVector.SubLista.this.remover(this.lastRet);
                         this.cursor = this.lastRet;
                         this.lastRet = -1;
-                        this.expectedModCount = ListaVector.this.conteoModulo;
+                        this.expectedModCount = ListaVector.this.moduloContador;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
@@ -2007,7 +2024,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             E resultado = this.padre.remover(this.compensacionDePadres
                     + indice);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio--;
             return resultado;
         }
@@ -2017,7 +2034,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             this.padre.removerRango(this.compensacionDePadres + desdeIndice,
                     this.compensacionDePadres + hastaIndice);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio -= hastaIndice - desdeIndice;
         }
 
@@ -2026,7 +2043,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             return new ListaVectorSpliterator<E>(ListaVector.this, ListaVector.this.listadoDatosElemento,
                     this.compensacion, this.compensacion + this.tamanio,
-                    this.conteoModulo);
+                    this.moduloContador);
         }
 
         @Override
@@ -2043,7 +2060,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
         }
 
         private void verificarParaMercantilizacion() {
-            if (ListaVector.this.conteoModulo != this.conteoModulo) {
+            if (ListaVector.this.moduloContador != this.moduloContador) {
                 throw new ConcurrentModificationException();
             }
         }

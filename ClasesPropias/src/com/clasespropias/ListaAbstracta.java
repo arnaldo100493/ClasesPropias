@@ -84,7 +84,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
      * proporcionar iteradores a prueba de fallas, este campo puede ser
      * ignorado.      
      */
-    protected transient int conteoModulo = 0;
+    protected transient int moduloContador = 0;
 
     //Constructor de la clase ListaAbstracta.
     /**
@@ -260,11 +260,19 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
 
     /**
      * <p>
-     * Imprime todos los elementos agregados en la lista.
+     * Muestra todos los elementos agregados en la lista.
      *
      * @return los elementos agregados en la lista.
      */
     public abstract String imprimir();
+
+    /**
+     * <p>
+     * Imprime todos los elementos agregados en la lista.
+     *
+     * @return los elementos agregados en la lista.
+     */
+    public abstract String mostrar();
 
     /**
      * {@inheritDoc}    
@@ -310,7 +318,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
      * <p>
      * Esta implementación se puede hacer para lanzar excepciones de tiempo de
      * ejecución en cara de la modificación concurrente, como se describe en la
-     * especificación para el campo (protegido) {@link #conteoModulo}.
+     * especificación para el campo (protegido) {@link #moduloContador}.
      *
      * @return un iterador sobre los elementos en esta lista en la secuencia
      * correcta      
@@ -353,7 +361,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
      * <p>
      * Esta implementación se puede hacer para lanzar excepciones de tiempo de
      * ejecución en cara de la modificación concurrente, como se describe en la
-     * especificación para el campo (protegido) {@link #conteoModulo}.
+     * especificación para el campo (protegido) {@link #moduloContador}.
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}      
      */
@@ -442,14 +450,14 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
      * {@code ListaAbstracta}. La subclase almacena, en campos privados,
      * desplazamiento de la sublista dentro de la lista de respaldo, el tamaño
      * de la sublista (que puede cambiar a lo largo de su vida útil) y lo
-     * esperado {@code conteoModulo} valor de la lista de respaldo. Hay dos
+     * esperado {@code moduloContador} valor de la lista de respaldo. Hay dos
      * variantes de la subclase, uno de los cuales implementa
      * {@code RandomAccess}. Si esta lista implementa {@code RandomAccess}, la
      * lista devuelta será ser una instancia de la subclase que implementa
      * {@code RandomAccess}.      
      * <p>
      * El {@code establecer(int, E)} de la subclase, todos los métodos null null
-     * null null null null null null null null null null null null     {@code obtener(int)},
+     * null null null null null null null null null null null null null null     {@code obtener(int)},
      * {@code agregar (int, E)}, {@code remover(int)}, {@code agregarTodo(int,
      * Coleccion)} y {@code removerRangg (int, int)} delegar en los métodos
      * correspondientes en la lista de resúmenes de respaldo, después de
@@ -530,11 +538,11 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
         int cursor = 0;
 
         /**
-         * El valor de conteoModulo que el iterador cree que el respaldo La
+         * El valor de moduloContador que el iterador cree que el respaldo La
          * lista debería tener. Si esta expectativa es violada, el iterador ha
          * detectado una modificación concurrente.          
          */
-        int expectedModCount = conteoModulo;
+        int expectedModCount = moduloContador;
 
         /**
          * Índice del elemento devuelto por la llamada más reciente a la
@@ -546,13 +554,13 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
         //Constructor de la clase interna Itr.
         Itr() {
             this.cursor = 0;
-            this.expectedModCount = conteoModulo;
+            this.expectedModCount = moduloContador;
             this.lastRet = -1;
         }
 
         //Métodos de la clase interna Itr.
         final void checkForComodification() {
-            if (conteoModulo != this.expectedModCount) {
+            if (moduloContador != this.expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -590,7 +598,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
                     this.cursor--;
                 }
                 this.lastRet = -1;
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -619,7 +627,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
                 ListaAbstracta.this.agregar(i, element);
                 this.lastRet = -1;
                 this.cursor = i + 1;
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -663,7 +671,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
 
             try {
                 ListaAbstracta.this.establecer(this.lastRet, e);
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -701,7 +709,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
             this.listaAbstracta = lista;
             this.compensacion = desdeIndice;
             this.tamanio = hastaIndice - desdeIndice;
-            this.conteoModulo = lista.conteoModulo;
+            this.moduloContador = lista.moduloContador;
         }
 
         //Métodos de la clase interna SubLista.
@@ -727,7 +735,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
             this.verificarParaComodificacion();
             this.listaAbstracta.agregarTodo(this.compensacion + indice,
                     coleccion);
-            this.conteoModulo = this.listaAbstracta.conteoModulo;
+            this.moduloContador = this.listaAbstracta.moduloContador;
             this.tamanio += tamanioColeccion;
             return true;
         }
@@ -743,6 +751,11 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
         @Override
         public String imprimir() {
             return this.imprimir();
+        }
+
+        @Override
+        public String mostrar() {
+            return this.mostrar();
         }
 
         @Override
@@ -764,7 +777,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
                 @Override
                 public void add(E e) {
                     this.listIterator.add(e);
-                    SubLista.this.conteoModulo = listaAbstracta.conteoModulo;
+                    SubLista.this.moduloContador = listaAbstracta.moduloContador;
                     tamanio++;
                 }
 
@@ -809,7 +822,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
                 @Override
                 public void remove() {
                     this.listIterator.remove();
-                    SubLista.this.conteoModulo = listaAbstracta.conteoModulo;
+                    SubLista.this.moduloContador = listaAbstracta.moduloContador;
                     tamanio--;
                 }
 
@@ -839,7 +852,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
             this.verificarParaComodificacion();
             E resultado = this.listaAbstracta.remover(indice
                     + this.compensacion);
-            this.conteoModulo = this.listaAbstracta.conteoModulo;
+            this.moduloContador = this.listaAbstracta.moduloContador;
             this.tamanio--;
             return resultado;
         }
@@ -849,7 +862,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
             this.verificarParaComodificacion();
             this.listaAbstracta.removerRango(desdeIndice + this.compensacion,
                     hastaIndice + this.compensacion);
-            this.conteoModulo = this.listaAbstracta.conteoModulo;
+            this.moduloContador = this.listaAbstracta.moduloContador;
             this.tamanio -= (hastaIndice - desdeIndice);
         }
 
@@ -865,7 +878,7 @@ public abstract class ListaAbstracta<E> extends ColeccionAbstracta<E>
         }
 
         private void verificarParaComodificacion() {
-            if (this.conteoModulo != this.listaAbstracta.conteoModulo) {
+            if (this.moduloContador != this.listaAbstracta.moduloContador) {
                 throw new ConcurrentModificationException();
             }
         }

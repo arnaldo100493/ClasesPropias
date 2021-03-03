@@ -242,7 +242,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         }
 
         this.tamanio += numeroNuevo;
-        this.conteoModulo++;
+        this.moduloContador++;
         return true;
     }
 
@@ -272,7 +272,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         //Poner el clon en estado "virgen".
         clone.primero = clone.ultimo = null;
         clone.tamanio = 0;
-        clone.conteoModulo = 0;
+        clone.moduloContador = 0;
 
         //Inicializa clon con nuestros elementos.
         for (Nodo<E> nodo = this.primero; nodo != null; nodo = nodo.siguiente) {
@@ -286,7 +286,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      * Desenlaza el primer nodo no nulo nodo.      
      */
     private E desenlazar(Nodo<E> nodo) {
-        // assert x != null;
+        // assert nodo != null;
         final E elemento = nodo.elemento;
         final Nodo<E> siguiente = nodo.siguiente;
         final Nodo<E> anterior = nodo.anterior;
@@ -307,7 +307,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
 
         nodo.elemento = null;
         this.tamanio--;
-        this.conteoModulo++;
+        this.moduloContador++;
         return elemento;
     }
 
@@ -355,19 +355,19 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      * Desenlaza el primer nodo no nulo primero.      
      */
     private E desenlazarPrimero(Nodo<E> primero) {
-        // assert f == first && f != null;
+        // assert p == primero && p != null;
         final E elemento = primero.elemento;
         final Nodo<E> siguiente = primero.siguiente;
         primero.elemento = null;
         primero.siguiente = null; //Ayuda GC.
-        primero = siguiente;
+        this.primero = siguiente;
         if (siguiente == null) {
             this.ultimo = null;
         } else {
             siguiente.anterior = null;
         }
         this.tamanio--;
-        this.conteoModulo++;
+        this.moduloContador++;
         return elemento;
     }
 
@@ -375,7 +375,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      * Desenlaza el último nodo no nulo ultimo.      
      */
     private E desenlazarUltimo(Nodo<E> ultimo) {
-        // assert l == last && l != null;
+        // assert u == ultimo && u != null;
         final E elemento = ultimo.elemento;
         final Nodo<E> anterior = ultimo.anterior;
         ultimo.elemento = null;
@@ -387,7 +387,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
             anterior.siguiente = null;
         }
         this.tamanio--;
-        this.conteoModulo++;
+        this.moduloContador++;
         return elemento;
     }
 
@@ -403,24 +403,10 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         return this.obtenerPrimero();
     }
 
-    /**
-     * Empuja un elemento sobre la pila representada por esta lista. En otra  
-     * palabras, inserta el elemento al principio de esta lista.    
-     * <p>
-     * Este método es equivalente a {@link #agregarPrimero}.
-     *
-     * @param elemento el elemento para empujar
-     * @since 1.6      
-     */
-    @Override
-    public void empujar(E elemento) {
-        this.agregarPrimero(elemento);
-    }
-
     @Override
     public E encuestar() {
-        final Nodo<E> primero = this.primero;
-        return (primero == null) ? null : this.desenlazarPrimero(primero);
+        final Nodo<E> p = this.primero;
+        return (p == null) ? null : this.desenlazarPrimero(p);
     }
 
     /**
@@ -432,8 +418,8 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E encuestarPrimero() {
-        final Nodo<E> primero = this.primero;
-        return (primero == null) ? null : this.desenlazarPrimero(primero);
+        final Nodo<E> p = this.primero;
+        return (p == null) ? null : this.desenlazarPrimero(p);
     }
 
     /**
@@ -445,8 +431,8 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E encuestarUltimo() {
-        final Nodo<E> ultimo = this.ultimo;
-        return (ultimo == null) ? null : this.desenlazarUltimo(ultimo);
+        final Nodo<E> u = this.ultimo;
+        return (u == null) ? null : this.desenlazarUltimo(u);
     }
 
     /**
@@ -463,39 +449,39 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
             anterior.siguiente = nuevoNodo;
         }
         this.tamanio++;
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
      * Enlaza elemento como primer elemento.      
      */
     private void enlazarPrimero(E elemento) {
-        final Nodo<E> primero = this.primero;
-        final Nodo<E> nuevoNodo = new Nodo<>(null, elemento, primero);
+        final Nodo<E> p = this.primero;
+        final Nodo<E> nuevoNodo = new Nodo<>(null, elemento, p);
         this.primero = nuevoNodo;
-        if (primero == null) {
+        if (p == null) {
             this.ultimo = nuevoNodo;
         } else {
-            primero.anterior = nuevoNodo;
+            p.anterior = nuevoNodo;
         }
         this.tamanio++;
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
      * Enlaza elemento como último elemento.      
      */
     void enlazarUltimo(E elemento) {
-        final Nodo<E> ultimo = this.ultimo;
-        final Nodo<E> nuevoNodo = new Nodo<>(ultimo, elemento, null);
+        final Nodo<E> u = this.ultimo;
+        final Nodo<E> nuevoNodo = new Nodo<>(u, elemento, null);
         this.ultimo = nuevoNodo;
-        if (ultimo == null) {
+        if (u == null) {
             this.primero = nuevoNodo;
         } else {
-            ultimo.siguiente = nuevoNodo;
+            u.siguiente = nuevoNodo;
         }
         this.tamanio++;
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -561,6 +547,16 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     }
 
     /**
+     * Devuelve <tt>true</tt> si esta lista no contiene elementos.      
+     *
+     * @return <tt>true</tt> si esta lista no contiene elementos      
+     */
+    @Override
+    public boolean estaVacia() {
+        return this.tamanio == 0;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -574,8 +570,14 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     @Override
     public String imprimir() {
         String s = "";
-        for (int i = 0; i < this.tamanio; i++) {
-            s += this.obtener(i) + "\n";
+        ListaEnlazada<E> listaEnlazadaAuxiliar = new ListaEnlazada<>();
+        while (!this.estaVacia()) {
+            E elemento = this.quitar();
+            s+= elemento + "\n";
+            listaEnlazadaAuxiliar.poner(elemento);
+        }
+        while(!listaEnlazadaAuxiliar.estaVacia()){
+            this.poner(listaEnlazadaAuxiliar.quitar());
         }
         return s;
     }
@@ -686,7 +688,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         }
         this.primero = this.ultimo = null;
         this.tamanio = 0;
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -724,12 +726,24 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String mostrar() {
+        String s = "";
+        for (int i = 0; i < this.tamanio; i++) {
+            s += this.obtener(i) + "\n";
+        }
+        return s;
+    }
+
+    /**
      * Construye un mensaje de detalle de IndexOutOfBoundsException. De las
      * muchas refactorizaciones posibles del código de manejo de errores, este
      * "perfilado" funciona mejor con máquinas virtuales tanto de servidor como
      * de cliente.      
      */
-    private String mostrarMensajeFueraDeLosLimites(int indice) {
+    private String mostrarMensajeFueraDeRango(int indice) {
         return "Índice: " + indice + ", Tamaño: " + this.tamanio;
     }
 
@@ -775,11 +789,11 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E obtenerPrimero() {
-        final Nodo<E> primero = this.primero;
-        if (primero == null) {
+        final Nodo<E> p = this.primero;
+        if (p == null) {
             throw new NoSuchElementException();
         }
-        return primero.elemento;
+        return p.elemento;
     }
 
     /**
@@ -790,11 +804,11 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E obtenerUltimo() {
-        final Nodo<E> ultimo = this.ultimo;
-        if (ultimo == null) {
+        final Nodo<E> u = this.ultimo;
+        if (u == null) {
             throw new NoSuchElementException();
         }
-        return ultimo.elemento;
+        return u.elemento;
     }
 
     /**
@@ -846,8 +860,8 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E ojear() {
-        final Nodo<E> primero = this.primero;
-        return (primero == null) ? null : primero.elemento;
+        final Nodo<E> p = this.primero;
+        return (p == null) ? null : p.elemento;
     }
 
     /**
@@ -860,8 +874,8 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E ojearPrimero() {
-        final Nodo<E> primero = this.primero;
-        return (primero == null) ? null : primero.elemento;
+        final Nodo<E> p = this.primero;
+        return (p == null) ? null : p.elemento;
     }
 
     /**
@@ -874,8 +888,8 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E ojearUltimo() {
-        final Nodo<E> ultimo = this.ultimo;
-        return (ultimo == null) ? null : ultimo.elemento;
+        final Nodo<E> u = this.ultimo;
+        return (u == null) ? null : u.elemento;
     }
 
     /**
@@ -962,6 +976,20 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         }
 
         return arreglo;
+    }
+
+    /**
+     * Empuja un elemento sobre la pila representada por esta lista. En otra  
+     * palabras, inserta el elemento al principio de esta lista.    
+     * <p>
+     * Este método es equivalente a {@link #agregarPrimero}.
+     *
+     * @param elemento el elemento para poner
+     * @since 1.6      
+     */
+    @Override
+    public void poner(E elemento) {
+        this.agregarPrimero(elemento);
     }
 
     /**
@@ -1063,11 +1091,11 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E removerPrimero() {
-        final Nodo<E> primero = this.primero;
-        if (primero == null) {
+        final Nodo<E> p = this.primero;
+        if (p == null) {
             throw new NoSuchElementException();
         }
-        return this.desenlazarPrimero(primero);
+        return this.desenlazarPrimero(p);
     }
 
     /**
@@ -1131,11 +1159,11 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
      */
     @Override
     public E removerUltimo() {
-        final Nodo<E> ultimo = this.ultimo;
-        if (ultimo == null) {
+        final Nodo<E> u = this.ultimo;
+        if (u == null) {
             throw new NoSuchElementException();
         }
-        return this.desenlazarUltimo(ultimo);
+        return this.desenlazarUltimo(u);
     }
 
     /**
@@ -1269,13 +1297,13 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
 
     private void verificarIndiceElemento(int indice) {
         if (!this.esIndiceElemento(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
     private void verificarIndicePosicion(int indice) {
         if (!this.esIndicePosicion(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1289,7 +1317,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     private void verificarRango(int indice) {
         if (indice >= this.tamanio) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1299,7 +1327,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     private void verificarRangoParaAgregar(int indice) {
         if (indice > this.tamanio || indice < 0) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1404,7 +1432,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
                     action.accept(e);
                 } while (p != null && --n > 0);
             }
-            if (this.list.conteoModulo != this.expectedModCount) {
+            if (this.list.moduloContador != this.expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -1416,7 +1444,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
                 if ((lst = this.list) == null) {
                     s = this.est = 0;
                 } else {
-                    this.expectedModCount = lst.conteoModulo;
+                    this.expectedModCount = lst.moduloContador;
                     this.current = lst.primero;
                     s = this.est = lst.tamanio;
                 }
@@ -1435,7 +1463,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
                 E e = p.elemento;
                 this.current = p.siguiente;
                 action.accept(e);
-                if (this.list.conteoModulo != this.expectedModCount) {
+                if (this.list.moduloContador != this.expectedModCount) {
                     throw new ConcurrentModificationException();
                 }
                 return true;
@@ -1473,7 +1501,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     private class ListItr implements ListIterator<E> {
 
         //Atributos de la clase interna ListItr.
-        private int expectedModCount = conteoModulo;
+        private int expectedModCount = moduloContador;
         private Nodo<E> lastReturned;
         private Nodo<E> next;
         private int nextIndex;
@@ -1505,7 +1533,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         }
 
         final void checkForComodification() {
-            if (conteoModulo != this.expectedModCount) {
+            if (moduloContador != this.expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -1513,7 +1541,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         @Override
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
-            while (conteoModulo == this.expectedModCount && this.nextIndex < tamanio) {
+            while (moduloContador == this.expectedModCount && this.nextIndex < tamanio) {
                 action.accept(this.next.elemento);
                 this.lastReturned = this.next;
                 this.next = this.next.siguiente;

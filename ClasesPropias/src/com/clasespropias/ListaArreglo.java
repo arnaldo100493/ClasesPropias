@@ -229,7 +229,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     @Override
     public boolean agregar(E elemento) {
         this.asegurarCapacidadInterna(
-                this.tamanio + 1); //Incrementa conteoModulo!!
+                this.tamanio + 1); //Incrementa moduloContador!!
         this.listadoDatosElemento[this.tamanio++] = elemento;
         return true;
     }
@@ -247,7 +247,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     public void agregar(int indice, E elemento) {
         this.verificarRangoParaAgregar(indice);
         this.asegurarCapacidadInterna(
-                this.tamanio + 1); //Incrementa conteoModulo!!
+                this.tamanio + 1); //Incrementa moduloContador!!
         System.arraycopy(this.listadoDatosElemento, indice,
                 this.listadoDatosElemento, indice + 1, this.tamanio - indice);
         this.listadoDatosElemento[indice] = elemento;
@@ -266,8 +266,8 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * @param elemento el componente que se agregará      
      */
     public void agregarElemento(E elemento) {
-        this.conteoModulo++;
-        this.ayudanteAsegurarCapacidad(this.tamanio + 1);
+        this.moduloContador++;
+        this.asegurarCapacidadAyudante(this.tamanio + 1);
         this.listadoDatosElemento[this.tamanio++] = elemento;
     }
 
@@ -290,7 +290,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         Object[] arregloObjetos = coleccion.paraFormar();
         int numeroNuevo = arregloObjetos.length;
         this.asegurarCapacidadInterna(
-                this.tamanio + numeroNuevo); //Incrementa conteoModulo!!
+                this.tamanio + numeroNuevo); //Incrementa moduloContador!!
         System.arraycopy(arregloObjetos, 0, this.listadoDatosElemento,
                 this.tamanio, numeroNuevo);
         this.tamanio += numeroNuevo;
@@ -319,7 +319,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         int numeroNuevo = arregloObjetos.length;
         this.asegurarCapacidadInterna(this.tamanio + numeroNuevo);
         /*Incrementa 
-         conteoModulo!!*/
+         moduloContador!!*/
         int numeroMovido = this.tamanio - indice;
         if (numeroMovido > 0) {
             System.arraycopy(this.listadoDatosElemento, indice,
@@ -354,7 +354,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     }
 
     private void asegurarCapacidadExplicita(int capacidadMinima) {
-        this.conteoModulo++;
+        this.moduloContador++;
         //Código consciente de desbordamiento.
         if (capacidadMinima - this.listadoDatosElemento.length > 0) {
             this.crecer(capacidadMinima);
@@ -378,7 +378,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      *
      * @see #asegurarCapacidad(int)      
      */
-    private void ayudanteAsegurarCapacidad(int capacidadMinima) {
+    private void asegurarCapacidadAyudante(int capacidadMinima) {
         //Código consciente de desbordamiento.
         if (capacidadMinima - this.listadoDatosElemento.length > 0) {
             this.crecer(capacidadMinima);
@@ -397,7 +397,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             ListaArreglo<?> arreglo = (ListaArreglo<?>) super.clone();
             arreglo.listadoDatosElemento = Arrays.copyOf(
                     this.listadoDatosElemento, this.tamanio);
-            arreglo.conteoModulo = 0;
+            arreglo.moduloContador = 0;
             return arreglo;
         } catch (CloneNotSupportedException ex) {
             //Esto no debería suceder, ya que somos Clonables.
@@ -588,7 +588,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      */
     private void escribirObjeto(ObjectOutputStream salida) throws IOException {
         //Escribe el conteo de elementos y cualquier material oculto.
-        int contadorModEsperado = this.conteoModulo;
+        int contadorModEsperado = this.moduloContador;
         salida.defaultWriteObject();
         /*Escribe el tamaño como capacidad para compatibilidad de comportamiento 
         con clone().*/
@@ -597,7 +597,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         for (int i = 0; i < this.tamanio; i++) {
             salida.writeObject(this.listadoDatosElemento[i]);
         }
-        if (this.conteoModulo != contadorModEsperado) {
+        if (this.moduloContador != contadorModEsperado) {
             throw new ConcurrentModificationException();
         }
     }
@@ -609,7 +609,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      */
     @Override
     public boolean estaVacia() {
-        return tamanio == 0;
+        return this.tamanio == 0;
     }
 
     /**
@@ -640,9 +640,9 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      *      
      */
     public void establecerTamanio(int nuevoTamanio) {
-        this.conteoModulo++;
+        this.moduloContador++;
         if (nuevoTamanio > this.tamanio) {
-            this.ayudanteAsegurarCapacidad(nuevoTamanio);
+            this.asegurarCapacidadAyudante(nuevoTamanio);
         } else {
             for (int i = nuevoTamanio; i < this.tamanio; i++) {
                 this.listadoDatosElemento[i] = null;
@@ -654,15 +654,15 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     @Override
     public void forEach(Consumer<? super E> action) {
         Objects.requireNonNull(action);
-        final int expectedModCount = this.conteoModulo;
+        final int expectedModCount = this.moduloContador;
         @SuppressWarnings("unchecked")
         final E[] elementData = (E[]) this.listadoDatosElemento;
         final int size = this.tamanio;
-        for (int i = 0; this.conteoModulo
+        for (int i = 0; this.moduloContador
                 == expectedModCount && i < size; i++) {
             action.accept(elementData[i]);
         }
-        if (this.conteoModulo != expectedModCount) {
+        if (this.moduloContador != expectedModCount) {
             throw new ConcurrentModificationException();
         }
     }
@@ -779,12 +779,12 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * rango({@code indice < 0 || indice > tamanio()})
      */
     public void insertarElementoEn(Object objeto, int indice) {
-        this.conteoModulo++;
+        this.moduloContador++;
         if (indice > this.tamanio) {
             throw new ArrayIndexOutOfBoundsException(indice
                     + " > " + this.tamanio);
         }
-        this.ayudanteAsegurarCapacidad(this.tamanio + 1);
+        this.asegurarCapacidadAyudante(this.tamanio + 1);
         System.arraycopy(this.listadoDatosElemento,
                 indice,
                 this.listadoDatosElemento,
@@ -837,7 +837,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      */
     @Override
     public void limpiar() {
-        this.conteoModulo++;
+        this.moduloContador++;
         //Limpia para dejar que GC haga su trabajo.
         for (int i = 0; i < this.tamanio; i++) {
             this.listadoDatosElemento[i] = null;
@@ -884,12 +884,24 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     }
 
     /**
+     * {@inheritDoc}      
+     */
+    @Override
+    public String mostrar() {
+        String s = "";
+        for (int i = 0; i < this.tamanio; i++) {
+            s += this.obtener(i) + "\n";
+        }
+        return s;
+    }
+
+    /**
      * Construye un mensaje de detalle de IndexOutOfBoundsException. De las
      * muchas refactorizaciones posibles del código de manejo de errores, este
      * "perfilado" funciona mejor con máquinas virtuales tanto de servidor como
      * de cliente.      
      */
-    private String mostrarMensajeFueraDeLosLimites(int indice) {
+    private String mostrarMensajeFueraDeRango(int indice) {
         return "Índice: " + indice + ", Tamaño: " + this.tamanio;
     }
 
@@ -909,12 +921,12 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     @Override
     @SuppressWarnings("unchecked")
     public void ordenar(Comparator<? super E> c) {
-        final int expectedModCount = this.conteoModulo;
+        final int expectedModCount = this.moduloContador;
         Arrays.sort((E[]) this.listadoDatosElemento, 0, this.tamanio, c);
-        if (this.conteoModulo != expectedModCount) {
+        if (this.moduloContador != expectedModCount) {
             throw new ConcurrentModificationException();
         }
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -1003,8 +1015,8 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * para minimizar el almacenamiento de una instancia de
      * <tt>ListaArreglo</tt>.
      */
-    public void recortarATamanio() {
-        this.conteoModulo++;
+    public void recortarAlTamanio() {
+        this.moduloContador++;
         if (this.tamanio < this.listadoDatosElemento.length) {
             this.listadoDatosElemento = (this.tamanio == 0)
                     ? this.LISTADO_DATOS_ELEMENTO_VACIO
@@ -1016,17 +1028,17 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     @SuppressWarnings("unchecked")
     public void reemplazarTodo(UnaryOperator<E> operator) {
         Objects.requireNonNull(operator);
-        final int expectedModCount = this.conteoModulo;
+        final int expectedModCount = this.moduloContador;
         final int size = this.tamanio;
-        for (int i = 0; this.conteoModulo == expectedModCount
+        for (int i = 0; this.moduloContador == expectedModCount
                 && i < size; i++) {
             this.listadoDatosElemento[i]
                     = operator.apply((E) this.listadoDatosElemento[i]);
         }
-        if (this.conteoModulo != expectedModCount) {
+        if (this.moduloContador != expectedModCount) {
             throw new ConcurrentModificationException();
         }
-        this.conteoModulo++;
+        this.moduloContador++;
     }
 
     /**
@@ -1040,7 +1052,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     @Override
     public E remover(int indice) {
         this.verificarRango(indice);
-        this.conteoModulo++;
+        this.moduloContador++;
         E valorAntiguo = this.listadoDatosElemento(indice);
         int numeroMovido = this.tamanio - indice - 1;
         if (numeroMovido > 0) {
@@ -1103,7 +1115,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * {@code false} de lo contrario.      
      */
     public boolean removerElemento(Object objeto) {
-        this.conteoModulo++;
+        this.moduloContador++;
         int i = this.indiceDe(objeto);
         if (i >= 0) {
             this.removerElementoEn(i);
@@ -1132,7 +1144,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * ({@code indice < 0 || indice > = tamanio()})      
      */
     public void removerElementoEn(int indice) {
-        this.conteoModulo++;
+        this.moduloContador++;
         if (indice >= this.tamanio) {
             throw new ArrayIndexOutOfBoundsException(indice + " >= "
                     + this.tamanio);
@@ -1176,7 +1188,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 for (int i = w; i < this.tamanio; i++) {
                     listadoDatosElemento[i] = null;
                 }
-                this.conteoModulo += this.tamanio - w;
+                this.moduloContador += this.tamanio - w;
                 this.tamanio = w;
                 modificado = true;
             }
@@ -1199,7 +1211,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      */
     @Override
     protected void removerRango(int desdeIndice, int hastaIndice) {
-        this.conteoModulo++;
+        this.moduloContador++;
         int numeroMovido = this.tamanio - hastaIndice;
         System.arraycopy(this.listadoDatosElemento, hastaIndice,
                 this.listadoDatosElemento, desdeIndice, numeroMovido);
@@ -1217,7 +1229,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
       * devuelve el valor eliminado.
       */
     private void removerRapido(int indice) {
-        this.conteoModulo++;
+        this.moduloContador++;
         int numeroMovido = this.tamanio - indice - 1;
         if (numeroMovido > 0) {
             System.arraycopy(this.listadoDatosElemento, indice + 1,
@@ -1237,9 +1249,9 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         //Dejará la colección sin modificaciones.
         int removerConteo = 0;
         final BitSet removerConjunto = new BitSet(this.tamanio);
-        final int conteoModuloEsperado = this.conteoModulo;
+        final int conteoModuloEsperado = this.moduloContador;
         final int tamanio = this.tamanio;
-        for (int i = 0; this.conteoModulo == conteoModuloEsperado
+        for (int i = 0; this.moduloContador == conteoModuloEsperado
                 && i < tamanio; i++) {
             @SuppressWarnings("unchecked")
             final E elemento = (E) this.listadoDatosElemento[i];
@@ -1248,7 +1260,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 removerConteo++;
             }
         }
-        if (this.conteoModulo != conteoModuloEsperado) {
+        if (this.moduloContador != conteoModuloEsperado) {
             throw new ConcurrentModificationException();
         }
 
@@ -1268,10 +1280,10 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 su trabajo.*/
             }
             this.tamanio = nuevoTamanio;
-            if (this.conteoModulo != conteoModuloEsperado) {
+            if (this.moduloContador != conteoModuloEsperado) {
                 throw new ConcurrentModificationException();
             }
-            this.conteoModulo++;
+            this.moduloContador++;
         }
 
         return cualquieraParaRemover;
@@ -1307,7 +1319,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
      * es parte de la interfaz {@link Lista}).      
      */
     public void removerTodosLosElementos() {
-        this.conteoModulo++;
+        this.moduloContador++;
         //Deja que gc haga su trabajo.
         for (int i = 0; i < this.tamanio; i++) {
             this.listadoDatosElemento[i] = null;
@@ -1492,13 +1504,13 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
 
     private void verificarIndiceElemento(int indice) {
         if (!this.esIndiceElemento(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
     private void verificarIndicePosicion(int indice) {
         if (!this.esIndicePosicion(indice)) {
-            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeLosLimites(indice));
+            throw new IndexOutOfBoundsException(this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1512,7 +1524,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     private void verificarRango(int indice) {
         if (indice >= this.tamanio) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1522,7 +1534,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     private void verificarRangoParaAgregar(int indice) {
         if (indice > this.tamanio || indice < 0) {
             throw new IndexOutOfBoundsException(
-                    this.mostrarMensajeFueraDeLosLimites(indice));
+                    this.mostrarMensajeFueraDeRango(indice));
         }
     }
 
@@ -1533,7 +1545,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     private class Itr implements Iterator<E> {
 
         //Atributos de la clase interna Itr.
-        int expectedModCount = conteoModulo;
+        int expectedModCount = moduloContador;
         int cursor;       //Índice del próximo elemento a devolver.
         int lastRet = -1;
 
@@ -1542,13 +1554,13 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         //Constructor de la clase interna Itr.
         Itr() {
             this.cursor = 0;
-            this.expectedModCount = conteoModulo;
+            this.expectedModCount = moduloContador;
             this.lastRet = -1;
         }
 
         //Métodos de la clase interna Itr.
         final void checkForComodification() {
-            if (conteoModulo != this.expectedModCount) {
+            if (moduloContador != this.expectedModCount) {
                 throw new ConcurrentModificationException();
             }
         }
@@ -1566,7 +1578,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             if (i >= elementData.length) {
                 throw new ConcurrentModificationException();
             }
-            while (i != size && conteoModulo == this.expectedModCount) {
+            while (i != size && moduloContador == this.expectedModCount) {
                 consumer.accept((E) elementData[i++]);
             }
             /*Actualizar una vez al final de la iteración para reducir el 
@@ -1608,7 +1620,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 ListaArreglo.this.remover(this.lastRet);
                 this.cursor = this.lastRet;
                 this.lastRet = -1;
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -1642,7 +1654,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 ListaArreglo.this.agregar(i, e);
                 this.cursor = i + 1;
                 this.lastRet = -1;
-                this.expectedModCount = conteoModulo;
+                this.expectedModCount = moduloContador;
             } catch (IndexOutOfBoundsException ex) {
                 throw new ConcurrentModificationException();
             }
@@ -1786,7 +1798,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             if ((lista = this.list) != null && (arreglo
                     = lista.listadoDatosElemento) != null) {
                 if ((hi = this.fence) < 0) {
-                    mc = lista.conteoModulo;
+                    mc = lista.moduloContador;
                     hi = lista.tamanio;
                 } else {
                     mc = this.expectedModCount;
@@ -1797,7 +1809,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                         E e = (E) arreglo[i];
                         action.accept(e);
                     }
-                    if (lista.conteoModulo == mc) {
+                    if (lista.moduloContador == mc) {
                         return;
                     }
                 }
@@ -1814,7 +1826,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 if ((lista = this.list) == null) {
                     hi = this.fence = 0;
                 } else {
-                    this.expectedModCount = lista.conteoModulo;
+                    this.expectedModCount = lista.moduloContador;
                     hi = this.fence = lista.tamanio;
                 }
             }
@@ -1842,7 +1854,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 @SuppressWarnings("unchecked")
                 E e = (E) this.list.listadoDatosElemento[i];
                 action.accept(e);
-                if (this.list.conteoModulo != this.expectedModCount) {
+                if (this.list.moduloContador != this.expectedModCount) {
                     throw new ConcurrentModificationException();
                 }
                 return true;
@@ -1866,7 +1878,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.compensacionDePadres = 0;
             this.compensacion = 0;
             this.tamanio = 0;
-            this.conteoModulo = 0;
+            this.moduloContador = 0;
         }
 
         SubLista(ListaAbstracta<E> padre, int compensacion, int desdeIndice,
@@ -1875,7 +1887,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.compensacionDePadres = desdeIndice;
             this.compensacion = compensacion + desdeIndice;
             this.tamanio = hastaIndice - desdeIndice;
-            this.conteoModulo = ListaArreglo.this.conteoModulo;
+            this.moduloContador = ListaArreglo.this.moduloContador;
         }
 
         //Métodos de la clase interna SubLista.
@@ -1884,7 +1896,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.verificarRangoParaAgregar(indice);
             this.verificarParaMercantilizacion();
             this.padre.agregar(this.compensacionDePadres + indice, elemento);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio++;
         }
 
@@ -1904,7 +1916,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             this.padre.agregarTodo(this.compensacionDePadres
                     + indice, coleccion);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio += tamanioColeccion;
             return true;
         }
@@ -1926,6 +1938,11 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         }
 
         @Override
+        public String mostrar() {
+            return new ListaArreglo<>().mostrar();
+        }
+
+        @Override
         public Iterator<E> iterator() {
             return this.listIterator();
         }
@@ -1943,7 +1960,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                 interna SubLista.*/
                 int cursor = indice;
                 int lastRet = -1;
-                int expectedModCount = ListaArreglo.this.conteoModulo;
+                int expectedModCount = ListaArreglo.this.moduloContador;
 
                 /*Métodos de la clase anónima interna ListIterator de la clase
                 interna SubLista.*/
@@ -1956,14 +1973,14 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                         ListaArreglo.SubLista.this.agregar(i, e);
                         this.cursor = i + 1;
                         this.lastRet = -1;
-                        this.expectedModCount = ListaArreglo.this.conteoModulo;
+                        this.expectedModCount = ListaArreglo.this.moduloContador;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
                 }
 
                 final void checkForComodification() {
-                    if (this.expectedModCount != ListaArreglo.this.conteoModulo) {
+                    if (this.expectedModCount != ListaArreglo.this.moduloContador) {
                         throw new ConcurrentModificationException();
                     }
                 }
@@ -1982,7 +1999,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                     if (offset + i >= elementData.length) {
                         throw new ConcurrentModificationException();
                     }
-                    while (i != size && conteoModulo == this.expectedModCount) {
+                    while (i != size && moduloContador == this.expectedModCount) {
                         consumer.accept((E) elementData[offset + (i++)]);
                     }
                     /*Actualizar una vez al final de la iteración para reducir 
@@ -2056,7 +2073,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
                         ListaArreglo.SubLista.this.remover(this.lastRet);
                         this.cursor = this.lastRet;
                         this.lastRet = -1;
-                        this.expectedModCount = ListaArreglo.this.conteoModulo;
+                        this.expectedModCount = ListaArreglo.this.moduloContador;
                     } catch (IndexOutOfBoundsException ex) {
                         throw new ConcurrentModificationException();
                     }
@@ -2097,7 +2114,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             E resultado = this.padre.remover(this.compensacionDePadres
                     + indice);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio--;
             return resultado;
         }
@@ -2107,7 +2124,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             this.padre.removerRango(this.compensacionDePadres + desdeIndice,
                     this.compensacionDePadres + hastaIndice);
-            this.conteoModulo = this.padre.conteoModulo;
+            this.moduloContador = this.padre.moduloContador;
             this.tamanio -= hastaIndice - desdeIndice;
         }
 
@@ -2116,7 +2133,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
             this.verificarParaMercantilizacion();
             return new ListaArregloSpliterator<E>(ListaArreglo.this,
                     this.compensacion, this.compensacion + this.tamanio,
-                    this.conteoModulo);
+                    this.moduloContador);
         }
 
         @Override
@@ -2133,7 +2150,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
         }
 
         private void verificarParaMercantilizacion() {
-            if (ListaArreglo.this.conteoModulo != this.conteoModulo) {
+            if (ListaArreglo.this.moduloContador != this.moduloContador) {
                 throw new ConcurrentModificationException();
             }
         }

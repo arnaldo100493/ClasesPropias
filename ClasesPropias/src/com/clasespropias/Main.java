@@ -20,34 +20,43 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        ListaArreglo<Empleado> listadoArreglo = new ListaArreglo<>();
-        
-        listadoArreglo.agregar(new Empleado("Arnaldo", 25, 14900));
-        listadoArreglo.agregar(new Empleado("Andres", 25, 14900));
-        listadoArreglo.agregar(new Empleado("Barrios", 25, 14900));
-        listadoArreglo.agregar(new Empleado("Mena", 25, 14900));
-        
-        for (Empleado empleado : listadoArreglo) {
+        ListaEnlazada<String> listaEnlazada = new ListaEnlazada<>();
+
+        listaEnlazada.poner("Arnaldo");
+        listaEnlazada.poner("Andres");
+        String e1 = listaEnlazada.quitar();
+        System.out.println("Se elininó el elemento: " + e1);
+
+        /*for (Empleado empleado : listadoArreglo) {
             System.out.println(empleado.obtenerDatos());
-        }
-        
+        }*/
+        System.out.println(listaEnlazada.imprimir());
+
     }
 
     private static class Empleado {
 
         String nombre;
+        String apellido;
         int edad;
-        double sueldo;
+        double salario;
 
-        public Empleado(String nombre, int edad, double sueldo) {
+        public Empleado() {
+            this.nombre = "";
+            this.apellido = "";
+            this.edad = 0;
+            this.salario = 0.0;
+        }
+
+        public Empleado(String nombre, String apellido, int edad, double salario) {
             this.nombre = nombre;
+            this.apellido = apellido;
             this.edad = edad;
-            this.sueldo = sueldo;
+            this.salario = salario;
         }
 
         public String obtenerDatos() {
-            return "Nombre: " + nombre + "\n Edad: " + edad + "\n Sueldo: " + sueldo;
+            return "Nombre: " + nombre + "\n \"Apellido:" + apellido + "\n Edad: " + edad + "\n Salario: " + salario;
         }
     }
-
 }

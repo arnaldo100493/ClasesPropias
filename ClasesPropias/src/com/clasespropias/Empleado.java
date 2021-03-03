@@ -13,17 +13,20 @@ public class Empleado {
 
     private String nombre;
     private String apellido;
-    private int salario;
+    private int edad;
+    private double salario;
 
     public Empleado() {
         this.nombre = "";
         this.apellido = "";
+        this.edad = 0;
         this.salario = 0;
     }
 
-    public Empleado(String nombre, String apellido, int salario) {
+    public Empleado(String nombre, String apellido, int edad, double salario) {
         this.nombre = nombre;
         this.apellido = apellido;
+        this.edad = edad;
         this.salario = salario;
     }
 
@@ -43,16 +46,25 @@ public class Empleado {
         this.apellido = apellido;
     }
 
-    public int getSalario() {
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    public double getSalario() {
         return salario;
     }
 
-    public void setSalario(int salario) {
+    public void setSalario(double salario) {
         this.salario = salario;
     }
 
     @Override
     public String toString() {
-        return "Empleado{" + "nombre=" + nombre + ", apellido=" + apellido + ", salario=" + salario + '}';
+        return "Empleado{" + "nombre=" + nombre + ", apellido=" + apellido + ", edad=" + edad + ", salario=" + salario + '}';
     }
+
 }

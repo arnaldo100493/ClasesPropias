@@ -324,7 +324,7 @@ public interface ColaDeque<E> extends Cola<E> {
      * <p>
      * Este método es equivalente a {@link #agregarPrimero}.
      *
-     * @param elemento el elemento para empujar
+     * @param elemento el elemento para poner
      * @throws IllegalStateException si el elemento no se puede agregar en este
      * tiempo debido a restricciones de capacidad
      * @throws ClassCastException si la clase del elemento especificado impide
@@ -334,7 +334,7 @@ public interface ColaDeque<E> extends Cola<E> {
      * @throws IllegalArgumentException si alguna propiedad del especificado
      * elemento impide que se agregue a esta deque      
      */
-    public void empujar(E elemento);
+    public void poner(E elemento);
 
     /**
      *  Recupera y elimina el encabezado de la cola representada por esta deque
