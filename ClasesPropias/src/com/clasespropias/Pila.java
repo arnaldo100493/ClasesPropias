@@ -6,6 +6,9 @@
 package com.clasespropias;
 
 /**
+ * Interfaz Pila para guardar y manipular elementos en una pila.
+ */
+/**
  *
  * @author FABAME
  * @since 1.0
@@ -13,6 +16,7 @@ package com.clasespropias;
  */
 public interface Pila<E> extends Coleccion<E> {
 
+    //Métodos de la interfaz Pila.
     /**
      * Coloca un elemento en la parte superior de esta pila. Esto tiene
      * exactamente el mismo efecto que:

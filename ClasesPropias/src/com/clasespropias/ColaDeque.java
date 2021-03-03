@@ -202,6 +202,8 @@ import java.util.Iterator;
  * @since 1.6 
  */
 public interface ColaDeque<E> extends Cola<E> {
+    
+    //Métodos de la interfaz ColaDeque.
 
     /**
      * Inserta el elemento especificado en la cola representada por esta deque

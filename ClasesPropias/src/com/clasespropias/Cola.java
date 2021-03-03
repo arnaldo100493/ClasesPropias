@@ -122,6 +122,8 @@ package com.clasespropias;
  *
  */
 public interface Cola<E> extends Coleccion<E> {
+    
+    //Métodos de la interfaz Cola.
 
     /**
      * Inserta el elemento especificado en esta cola si es posible hacerlo
