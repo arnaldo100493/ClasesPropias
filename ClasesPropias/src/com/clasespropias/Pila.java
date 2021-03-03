@@ -8,6 +8,8 @@ package com.clasespropias;
 /**
  *
  * @author FABAME
+ * @since 1.0
+ * @param <E> el tipo de elementos contenidos en esta colección
  */
 public interface Pila<E> extends Coleccion<E> {
 
