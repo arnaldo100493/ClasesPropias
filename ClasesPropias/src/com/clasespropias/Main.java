@@ -23,7 +23,9 @@ public class Main {
         ListaEnlazada<String> listaEnlazada = new ListaEnlazada<>();
 
         listaEnlazada.poner("Arnaldo");
-        listaEnlazada.poner("Andres");
+        listaEnlazada.poner("Andrés");
+        listaEnlazada.poner("Barrios");
+        listaEnlazada.poner("Mena");
         String e1 = listaEnlazada.quitar();
         System.out.println("Se elininó el elemento: " + e1);
 

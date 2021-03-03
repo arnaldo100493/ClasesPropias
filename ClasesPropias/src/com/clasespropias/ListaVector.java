@@ -703,7 +703,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
     public synchronized String imprimir() {
         String s = "";
         for (int i = 0; i < this.contadorElemento; i++) {
-            s += this.obtener(i) + "\n";
+            s += "\n" + this.obtener(i);
         }
         return s;
     }
@@ -868,7 +868,7 @@ public class ListaVector<E> extends ListaAbstracta<E>
     public synchronized String mostrar() {
         String s = "";
         for (int i = 0; i < this.contadorElemento; i++) {
-            s += this.obtener(i) + "\n";
+            s += "\n" + this.obtener(i);
         }
         return s;
     }

@@ -573,7 +573,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
         ListaEnlazada<E> listaEnlazadaAuxiliar = new ListaEnlazada<>();
         while (!this.estaVacia()) {
             E elemento = this.quitar();
-            s+= elemento + "\n";
+            s+= "\n" + elemento;
             listaEnlazadaAuxiliar.poner(elemento);
         }
         while(!listaEnlazadaAuxiliar.estaVacia()){
@@ -732,7 +732,7 @@ public class ListaEnlazada<E> extends ListaSecuencialAbstracta<E>
     public String mostrar() {
         String s = "";
         for (int i = 0; i < this.tamanio; i++) {
-            s += this.obtener(i) + "\n";
+            s += "\n" + this.obtener(i);
         }
         return s;
     }

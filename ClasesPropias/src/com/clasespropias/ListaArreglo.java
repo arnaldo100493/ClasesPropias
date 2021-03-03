@@ -691,7 +691,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     public String imprimir() {
         String s = "";
         for (int i = 0; i < this.tamanio; i++) {
-            s += this.obtener(i) + "\n";
+            s += "\n" + this.obtener(i);
         }
         return s;
     }
@@ -890,7 +890,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     public String mostrar() {
         String s = "";
         for (int i = 0; i < this.tamanio; i++) {
-            s += this.obtener(i) + "\n";
+            s += "\n" + this.obtener(i);
         }
         return s;
     }
