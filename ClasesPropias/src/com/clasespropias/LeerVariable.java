@@ -127,7 +127,7 @@ public abstract class LeerVariable {
         return JOptionPane.showInputDialog(null, mensaje);
     }
 
-    //Método para leer objetos con JOptionPane con un mensaje y
+    //Método para leer objetos con JOptionPane con un mensaje, título y tipo mensaje
     public static String leerObjetoConJOptionPane(Object mensaje, String titulo, int tipoMensaje) {
         return JOptionPane.showInputDialog(null, mensaje, titulo, tipoMensaje);
     }
