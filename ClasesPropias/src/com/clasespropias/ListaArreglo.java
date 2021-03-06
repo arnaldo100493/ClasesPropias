@@ -150,7 +150,7 @@ public class ListaArreglo<E> extends ListaAbstracta<E>
     /**
      * Instancia de arreglo vacía compartida utilizada para instancias vacías.
      */
-    private Object[] LISTADO_DATOS_ELEMENTO_VACIO = {};
+    private static final Object[] LISTADO_DATOS_ELEMENTO_VACIO = {};
 
     /**
      * El tamaño de ListaArreglo (la cantidad de elementos que contiene).
